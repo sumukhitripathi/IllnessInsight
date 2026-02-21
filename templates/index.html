@@ -1,0 +1,715 @@
+{% extends "base.html" %}
+
+{% block title %}IntelliMed - AI-Powered Healthcare Platform{% endblock %}
+
+{% block extra_head %}
+<style>
+    .hero-section {
+        height: 100vh;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    #particles-js {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 10;
+        text-align: center;
+        color: white;
+    }
+    
+    .hero-title {
+        font-size: 4rem;
+        font-weight: 800;
+        margin-bottom: 2rem;
+        animation: fadeInUp 1s ease-out;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.5rem;
+        margin-bottom: 3rem;
+        animation: fadeInUp 1s ease-out 0.3s both;
+    }
+    
+    .cta-button {
+        background: linear-gradient(45deg, #ff6b6b, #feca57);
+        border: none;
+        padding: 1rem 3rem;
+        font-size: 1.2rem;
+        font-weight: 600;
+        border-radius: 50px;
+        color: white;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        animation: fadeInUp 1s ease-out 0.6s both;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    
+    .cta-button:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        color: white;
+    }
+    
+    .section {
+        padding: 5rem 0;
+        opacity: 0;
+        transform: translateY(50px);
+        transition: all 0.8s ease;
+    }
+    
+    .section.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .feature-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        color: white;
+        font-size: 2rem;
+    }
+    
+    .timeline {
+        position: relative;
+        padding: 2rem 0;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(to bottom, #667eea, #764ba2);
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin: 3rem 0;
+        width: 45%;
+    }
+    
+    .timeline-item:nth-child(odd) {
+        margin-left: 0;
+    }
+    
+    .timeline-item:nth-child(even) {
+        margin-left: 55%;
+    }
+    
+    .timeline-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        position: relative;
+    }
+    
+    .timeline-icon {
+        position: absolute;
+        top: 50%;
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+    }
+    
+    .timeline-item:nth-child(odd) .timeline-icon {
+        right: -30px;
+        transform: translateY(-50%);
+    }
+    
+    .timeline-item:nth-child(even) .timeline-icon {
+        left: -30px;
+        transform: translateY(-50%);
+    }
+    
+    .team-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .team-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+    
+    .team-card:hover::before {
+        transform: scaleX(1);
+    }
+    
+    .team-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    
+    .team-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        color: white;
+        font-size: 3rem;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        
+        .timeline::before {
+            left: 30px;
+        }
+        
+        .timeline-item {
+            width: calc(100% - 80px);
+            margin-left: 80px !important;
+        }
+        
+        .timeline-icon {
+            left: -30px !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block navbar %}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div id="particles-js"></div>
+    <div class="hero-content">
+        <h1 class="hero-title">
+            <i class="fas fa-brain me-3"></i>IntelliMed
+        </h1>
+        <p class="hero-subtitle">
+            AI-Powered Healthcare for Everyone<br>
+            Personalized • Accessible • Intelligent
+        </p>
+        <a href="{{ url_for('main_app') }}" class="cta-button">
+            <i class="fas fa-rocket me-2"></i>Go to Main Page
+        </a>
+    </div>
+</section>
+
+<!-- Navigation after hero -->
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">
+            <i class="fas fa-brain me-2"></i>IntelliMed
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#overview">Overview</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#features">Features</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#journey">Patient Journey</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#team">Team</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('main_app') }}">
+                        <i class="fas fa-arrow-right me-1"></i>Get Started
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Project Overview -->
+<section id="overview" class="section bg-light">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h2 class="display-4 fw-bold mb-4">
+                    Healthcare Reimagined
+                </h2>
+                <p class="lead mb-4">
+                    IntelliMed revolutionizes healthcare accessibility through AI-powered conversations, 
+                    personalized coaching, and intelligent facility finding. Our platform serves seniors, 
+                    children, anxious patients, and caregivers with empathetic, age-appropriate interactions.
+                </p>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        Voice-enabled senior-friendly interface
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        Child-friendly avatars and storytelling
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        Empathetic AI with emotion detection
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        Proactive health coaching and reminders
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-6">
+                <img src="https://pixabay.com/get/g26d7e40b06cef9396d168804a7c21b845f105c3f5c254eadd63bec16b187bf2b4ba931481d8e5afd57f8a4a6ae054369c4416dbd8d36d247ceda0f091a5dfbaf_1280.jpg" 
+                     alt="Healthcare Technology" class="img-fluid rounded shadow">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Key Features -->
+<section id="features" class="section">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-4 fw-bold mb-3">Key Features</h2>
+            <p class="lead text-muted">Comprehensive healthcare solutions powered by artificial intelligence</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h4>AI Chat Personas</h4>
+                    <p>Multiple specialized chat interfaces designed for seniors, children, anxious patients, and caregivers with empathetic responses.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h4>Facility Finder</h4>
+                    <p>Interactive map-based search for hospitals, clinics, pharmacies, and urgent care centers with real-time location services.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <h4>Health Coaching</h4>
+                    <p>Personalized goal setting, progress tracking, and AI-powered recommendations for fitness, nutrition, and wellness.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h4>Symptom Checker</h4>
+                    <p>AI-powered disease prediction based on symptoms with urgency assessment and professional consultation recommendations.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <h4>Telemedicine</h4>
+                    <p>Virtual appointment scheduling, consultation booking, and emergency contact access for comprehensive healthcare support.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                    <h4>Voice Interface</h4>
+                    <p>Senior-friendly voice interactions with large fonts, simple language, and accessible design for all age groups.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Patient Journey Timeline -->
+<section id="journey" class="section bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-4 fw-bold mb-3">Patient Journey</h2>
+            <p class="lead text-muted">Comprehensive care from symptom assessment to post-visit follow-up</p>
+        </div>
+        
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="timeline-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h4>Initial Assessment</h4>
+                    <p>Patients begin with persona selection and basic health profile creation. Our AI adapts to their age, concerns, and communication preferences.</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="timeline-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h4>AI Consultation</h4>
+                    <p>Empathetic chat sessions with specialized personas. Seniors get voice support, children enjoy friendly avatars, and anxious patients receive gentle guidance.</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="timeline-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h4>Symptom Analysis</h4>
+                    <p>AI-powered symptom checker provides preliminary assessments, urgency levels, and recommendations for appropriate care levels.</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="timeline-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h4>Facility Matching</h4>
+                    <p>Interactive map helps locate nearby healthcare providers based on needs, insurance, and location preferences with detailed facility information.</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="timeline-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h4>Appointment Booking</h4>
+                    <p>Seamless telemedicine or in-person appointment scheduling with healthcare providers, including emergency contact options.</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="timeline-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <h4>Post-Visit Care</h4>
+                    <p>Personalized health coaching, medication reminders, progress tracking, and follow-up care recommendations for ongoing wellness.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Team Section -->
+<section id="team" class="section">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-4 fw-bold mb-3">Our Team</h2>
+            <p class="lead text-muted">Healthcare professionals and AI experts working together</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <h5>Dr. Sarah Chen</h5>
+                    <p class="text-muted">Chief Medical Officer</p>
+                    <p>Pediatric specialist with 15 years of experience in child-friendly healthcare communication.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h5>Alex Rodriguez</h5>
+                    <p class="text-muted">AI Research Lead</p>
+                    <p>Machine learning expert specializing in natural language processing and empathetic AI systems.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h5>Maria Johnson</h5>
+                    <p class="text-muted">Senior Care Specialist</p>
+                    <p>Geriatric care expert focused on accessible technology solutions for elderly patients.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h5>David Kim</h5>
+                    <p class="text-muted">Lead Developer</p>
+                    <p>Full-stack developer with expertise in healthcare applications and accessibility design.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="section bg-primary text-white">
+    <div class="container text-center">
+        <h2 class="display-4 fw-bold mb-4">Ready to Transform Healthcare?</h2>
+        <p class="lead mb-4">
+            Join thousands of patients and healthcare providers using IntelliMed for better health outcomes.
+        </p>
+        <a href="{{ url_for('main_app') }}" class="btn btn-light btn-lg px-5 py-3">
+            <i class="fas fa-rocket me-2"></i>Start Your Journey
+        </a>
+    </div>
+</section>
+{% endblock %}
+
+{% block footer %}
+<footer class="bg-dark text-light py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <h5><i class="fas fa-brain me-2"></i>IntelliMed</h5>
+                <p class="text-muted">
+                    AI-powered healthcare platform providing personalized, accessible, and intelligent medical support for all.
+                </p>
+                <div class="social-links">
+                    <a href="#" class="text-light me-3 fs-5"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-light me-3 fs-5"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="text-light me-3 fs-5"><i class="fab fa-linkedin"></i></a>
+                    <a href="#" class="text-light fs-5"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h6 class="text-uppercase fw-bold">Platform</h6>
+                <ul class="list-unstyled">
+                    <li><a href="{{ url_for('chat') }}" class="text-muted text-decoration-none">AI Chat</a></li>
+                    <li><a href="{{ url_for('facility_finder') }}" class="text-muted text-decoration-none">Find Facilities</a></li>
+                    <li><a href="{{ url_for('health_coach') }}" class="text-muted text-decoration-none">Health Coach</a></li>
+                    <li><a href="{{ url_for('appointments') }}" class="text-muted text-decoration-none">Appointments</a></li>
+                </ul>
+            </div>
+            
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h6 class="text-uppercase fw-bold">Support</h6>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="text-muted text-decoration-none">Help Center</a></li>
+                    <li><a href="#" class="text-muted text-decoration-none">Contact Us</a></li>
+                    <li><a href="#" class="text-muted text-decoration-none">Privacy</a></li>
+                    <li><a href="#" class="text-muted text-decoration-none">Terms</a></li>
+                </ul>
+            </div>
+            
+            <div class="col-lg-4 mb-4">
+                <h6 class="text-uppercase fw-bold">Emergency Contacts</h6>
+                <div class="emergency-contacts">
+                    <p class="mb-2">
+                        <i class="fas fa-phone text-danger me-2"></i>
+                        <strong>Emergency:</strong> 108
+                    </p>
+                    <p class="mb-2">
+                        <i class="fas fa-comments text-info me-2"></i>
+                        <strong>Crisis Text:</strong> Text HOME to 741741
+                    </p>
+                    <p class="mb-0">
+                        <i class="fas fa-headset text-success me-2"></i>
+                        <strong>Support:</strong> 1-800-INTELLIMED
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <hr class="text-muted">
+        
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <p class="mb-0 text-muted">&copy; 2025 IntelliMed. All rights reserved.</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <p class="mb-0 text-muted">
+                    Made with <i class="fas fa-heart text-danger"></i> for better healthcare
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Initialize Particles.js
+    particlesJS('particles-js', {
+        particles: {
+            number: {
+                value: 80,
+                density: {
+                    enable: true,
+                    value_area: 800
+                }
+            },
+            color: {
+                value: '#ffffff'
+            },
+            shape: {
+                type: 'circle'
+            },
+            opacity: {
+                value: 0.5,
+                random: false
+            },
+            size: {
+                value: 3,
+                random: true
+            },
+            line_linked: {
+                enable: true,
+                distance: 150,
+                color: '#ffffff',
+                opacity: 0.4,
+                width: 1
+            },
+            move: {
+                enable: true,
+                speed: 6,
+                direction: 'none',
+                random: false,
+                straight: false,
+                out_mode: 'out',
+                bounce: false
+            }
+        },
+        interactivity: {
+            detect_on: 'canvas',
+            events: {
+                onhover: {
+                    enable: true,
+                    mode: 'repulse'
+                },
+                onclick: {
+                    enable: true,
+                    mode: 'push'
+                },
+                resize: true
+            }
+        },
+        retina_detect: true
+    });
+
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Reveal sections on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.section').forEach(section => {
+        observer.observe(section);
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,421 @@
+{% extends "base.html" %}
+
+{% block title %}AI Chat - IntelliMed{% endblock %}
+
+{% block extra_head %}
+<style>
+    .chat-container {
+        height: 70vh;
+        display: flex;
+        flex-direction: column;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .chat-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: between;
+    }
+    
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem;
+        background: #f8f9fa;
+    }
+    
+    .message {
+        margin-bottom: 1rem;
+        animation: fadeInUp 0.3s ease;
+    }
+    
+    .user-message {
+        display: flex;
+        justify-content: flex-end;
+    }
+    
+    .bot-message {
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+    }
+    
+    .message-content {
+        max-width: 80%;
+        padding: 0.75rem 1rem;
+        border-radius: 20px;
+        word-wrap: break-word;
+    }
+    
+    .user-message .message-content {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        margin-left: 1rem;
+    }
+    
+    .bot-message .message-content {
+        background: white;
+        color: #333;
+        border: 1px solid #e9ecef;
+        margin-right: 1rem;
+    }
+    
+    .bot-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+    
+    .chat-input {
+        padding: 1rem;
+        background: white;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .persona-senior {
+        font-size: 1.2rem;
+    }
+    
+    .persona-pediatric .bot-avatar {
+        background: linear-gradient(45deg, #feca57, #ff6b6b);
+    }
+    
+    .persona-empathetic .bot-avatar {
+        background: linear-gradient(45deg, #ff9a56, #ff6b6b);
+    }
+    
+    .persona-caregiver .bot-avatar {
+        background: linear-gradient(45deg, #48cae4, #023047);
+    }
+    
+    .typing-indicator {
+        display: none;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        background: white;
+        border-radius: 20px;
+        margin-right: 1rem;
+        border: 1px solid #e9ecef;
+    }
+    
+    .typing-dots {
+        display: flex;
+        gap: 4px;
+    }
+    
+    .typing-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #6c757d;
+        animation: typingDot 1.4s infinite;
+    }
+    
+    .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    
+    .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+    
+    @keyframes typingDot {
+        0%, 60%, 100% {
+            transform: translateY(0);
+        }
+        30% {
+            transform: translateY(-10px);
+        }
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .voice-button {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .voice-button.recording {
+        background: #dc3545 !important;
+        animation: pulse 1s infinite;
+    }
+    
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+        }
+        70% {
+            box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5 pt-4">
+    <div class="row">
+        <!-- Persona Selection Sidebar -->
+        <div class="col-lg-3 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-users me-2"></i>Chat Personas
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="{{ url_for('chat', persona='senior') }}" 
+                           class="list-group-item list-group-item-action {% if persona == 'senior' %}active{% endif %}">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-user-clock text-primary me-3"></i>
+                                <div>
+                                    <h6 class="mb-1">Senior Care</h6>
+                                    <small>Voice support, large fonts</small>
+                                </div>
+                            </div>
+                        </a>
+                        
+                        <a href="{{ url_for('chat', persona='pediatric') }}" 
+                           class="list-group-item list-group-item-action {% if persona == 'pediatric' %}active{% endif %}">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-child text-warning me-3"></i>
+                                <div>
+                                    <h6 class="mb-1">Kids & Teens</h6>
+                                    <small>Friendly, age-appropriate</small>
+                                </div>
+                            </div>
+                        </a>
+                        
+                        <a href="{{ url_for('chat', persona='empathetic') }}" 
+                           class="list-group-item list-group-item-action {% if persona == 'empathetic' %}active{% endif %}">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-heart text-danger me-3"></i>
+                                <div>
+                                    <h6 class="mb-1">Anxious Patients</h6>
+                                    <small>Gentle, supportive</small>
+                                </div>
+                            </div>
+                        </a>
+                        
+                        <a href="{{ url_for('chat', persona='caregiver') }}" 
+                           class="list-group-item list-group-item-action {% if persona == 'caregiver' %}active{% endif %}">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-user-nurse text-success me-3"></i>
+                                <div>
+                                    <h6 class="mb-1">Caregivers</h6>
+                                    <small>Support for helpers</small>
+                                </div>
+                            </div>
+                        </a>
+                        
+                        <a href="{{ url_for('chat', persona='general') }}" 
+                           class="list-group-item list-group-item-action {% if persona == 'general' %}active{% endif %}">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-user-md text-info me-3"></i>
+                                <div>
+                                    <h6 class="mb-1">General</h6>
+                                    <small>Standard healthcare chat</small>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>Quick Actions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary btn-sm" onclick="sendQuickMessage('I need help with my symptoms')">
+                            <i class="fas fa-thermometer-half me-2"></i>Symptoms
+                        </button>
+                        <button class="btn btn-outline-success btn-sm" onclick="sendQuickMessage('I want to find a doctor near me')">
+                            <i class="fas fa-map-marker-alt me-2"></i>Find Doctor
+                        </button>
+                        <button class="btn btn-outline-info btn-sm" onclick="sendQuickMessage('I need medication information')">
+                            <i class="fas fa-pills me-2"></i>Medications
+                        </button>
+                        <button class="btn btn-outline-warning btn-sm" onclick="sendQuickMessage('I have questions about my health')">
+                            <i class="fas fa-question-circle me-2"></i>Health Questions
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chat Interface -->
+        <div class="col-lg-9">
+            <div class="chat-container persona-{{ persona }}">
+                <!-- Chat Header -->
+                <div class="chat-header">
+                    <div class="d-flex align-items-center flex-grow-1">
+                        <div class="bot-avatar me-3">
+                            {% if persona == 'senior' %}
+                                <i class="fas fa-user-clock"></i>
+                            {% elif persona == 'pediatric' %}
+                                <i class="fas fa-child"></i>
+                            {% elif persona == 'empathetic' %}
+                                <i class="fas fa-heart"></i>
+                            {% elif persona == 'caregiver' %}
+                                <i class="fas fa-user-nurse"></i>
+                            {% else %}
+                                <i class="fas fa-user-md"></i>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <h5 class="mb-0">
+                                {% if persona == 'senior' %}
+                                    Senior Care Assistant
+                                {% elif persona == 'pediatric' %}
+                                    Friendly Health Buddy
+                                {% elif persona == 'empathetic' %}
+                                    Caring Health Guide
+                                {% elif persona == 'caregiver' %}
+                                    Caregiver Support
+                                {% else %}
+                                    Health Assistant
+                                {% endif %}
+                            </h5>
+                            <small class="opacity-75">
+                                {% if persona == 'senior' %}
+                                    Voice-enabled support with simple language
+                                {% elif persona == 'pediatric' %}
+                                    Fun and friendly healthcare chat for kids
+                                {% elif persona == 'empathetic' %}
+                                    Understanding support for anxious patients
+                                {% elif persona == 'caregiver' %}
+                                    Support for those caring for others
+                                {% else %}
+                                    Professional healthcare assistance
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-outline-light btn-sm" onclick="clearChat()">
+                            <i class="fas fa-trash me-2"></i>Clear
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Chat Messages -->
+                <div class="chat-messages" id="chat-messages">
+                    <div class="bot-message">
+                        <div class="bot-avatar">
+                            {% if persona == 'senior' %}
+                                <i class="fas fa-user-clock"></i>
+                            {% elif persona == 'pediatric' %}
+                                <i class="fas fa-child"></i>
+                            {% elif persona == 'empathetic' %}
+                                <i class="fas fa-heart"></i>
+                            {% elif persona == 'caregiver' %}
+                                <i class="fas fa-user-nurse"></i>
+                            {% else %}
+                                <i class="fas fa-user-md"></i>
+                            {% endif %}
+                        </div>
+                        <div class="message-content">
+                            {% if persona == 'senior' %}
+                                Hello! I'm here to help you with your healthcare needs. You can speak to me using the voice button or type your questions. I'll use simple language and speak clearly. How can I assist you today?
+                            {% elif persona == 'pediatric' %}
+                                Hi there! 🌟 I'm your friendly health buddy! I'm here to help answer any questions you might have about staying healthy and feeling good. Don't worry - we'll make this fun and easy to understand! What would you like to know?
+                            {% elif persona == 'empathetic' %}
+                                Hello, and welcome. I understand that health concerns can feel overwhelming, and I want you to know that you're not alone. I'm here to listen and support you with patience and care. Please feel free to share whatever is on your mind - there's no rush.
+                            {% elif persona == 'caregiver' %}
+                                Hello! I know how challenging and rewarding it can be to care for someone else. I'm here to support you with practical advice, emotional support, and resources to help you in your caregiving journey. How can I help you today?
+                            {% else %}
+                                Hello! I'm your AI health assistant. I'm here to help answer your health questions, provide information about symptoms, help you find healthcare facilities, and offer general health guidance. How can I assist you today?
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Chat Input -->
+                <div class="chat-input">
+                    <div class="row g-2">
+                        <div class="col">
+                            <div class="input-group">
+                                <input type="text" 
+                                       id="message-input" 
+                                       class="form-control{% if persona == 'senior' %} form-control-lg{% endif %}" 
+                                       placeholder="Type your message here..."
+                                       {% if persona == 'senior' %}style="font-size: 1.1rem;"{% endif %}>
+                                
+                                {% if persona == 'senior' %}
+                                <button class="btn btn-outline-secondary voice-button" 
+                                        id="voice-btn" 
+                                        type="button" 
+                                        title="Click to speak">
+                                    <i class="fas fa-microphone"></i>
+                                </button>
+                                {% endif %}
+                                
+                                <button class="btn btn-primary" id="send-btn" type="button">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+<script>
+    // Initialize chat with current persona
+    window.currentPersona = '{{ persona }}';
+    
+    // Initialize chat functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeChat('{{ persona }}');
+    });
+    
+    function sendQuickMessage(message) {
+        document.getElementById('message-input').value = message;
+        sendMessage();
+    }
+    
+    function clearChat() {
+        if (confirm('Are you sure you want to clear the chat history?')) {
+            const messagesContainer = document.getElementById('chat-messages');
+            // Keep only the welcome message
+            const welcomeMessage = messagesContainer.children[0];
+            messagesContainer.innerHTML = '';
+            messagesContainer.appendChild(welcomeMessage);
+        }
+    }
+</script>
+{% endblock %}

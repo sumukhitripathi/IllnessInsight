@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Medical Facility Finder - IntelliMed{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5 pt-4">
+    <div class="row">
+        <!-- Controls Sidebar -->
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-search me-2"></i>Find Healthcare Facilities
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Location Controls -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold">
+                            <i class="fas fa-map-marker-alt me-2"></i>Your Location
+                        </h6>
+                        
+                        <button id="find-location-btn" class="btn btn-primary w-100 mb-3">
+                            <i class="fas fa-crosshairs me-2"></i>Find My Location
+                        </button>
+                        
+                        <div class="input-group mb-3">
+                            <input type="text" 
+                                   id="manual-location-input" 
+                                   class="form-control" 
+                                   placeholder="Enter address, city, or hospital name">
+                            <button id="search-location-btn" class="btn btn-outline-primary">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        
+                        <div id="location-status" class="alert d-none">
+                            <small id="location-text"></small>
+                        </div>
+                    </div>
+                    
+                    <!-- Search Filters -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold">
+                            <i class="fas fa-filter me-2"></i>Search Filters
+                        </h6>
+                        
+                        <div class="mb-3">
+                            <label for="facility-type-select" class="form-label">Facility Type</label>
+                            <select id="facility-type-select" class="form-select">
+                                <option value="all">All Types</option>
+                                <option value="hospital">Hospitals</option>
+                                <option value="clinic">Clinics</option>
+                                <option value="pharmacy">Pharmacies</option>
+                                <option value="urgent_care">Urgent Care</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="radius-select" class="form-label">Search Radius</label>
+                            <select id="radius-select" class="form-select">
+                                <option value="1">1 km</option>
+                                <option value="5" selected>5 km</option>
+                                <option value="10">10 km</option>
+                                <option value="20">20 km</option>
+                            </select>
+                        </div>
+                        
+                        <button id="search-facilities-btn" class="btn btn-success w-100" disabled>
+                            <i class="fas fa-search me-2"></i>Search Facilities
+                        </button>
+                    </div>
+                    
+                    <!-- Loading Spinner -->
+                    <div class="loading-spinner text-center" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <div class="mt-2">Searching facilities...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Emergency Contacts -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-exclamation-triangle text-danger me-2"></i>Emergency Contacts
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="emergency-contact mb-2">
+                        <i class="fas fa-phone text-danger me-2"></i>
+                        <strong>Emergency:</strong> 108
+                    </div>
+                    <div class="emergency-contact mb-2">
+                        <i class="fas fa-comments text-info me-2"></i>
+                        <strong>Crisis Text:</strong> HOME to 741741
+                    </div>
+                    <div class="emergency-contact">
+                        <i class="fas fa-poison text-warning me-2"></i>
+                        <strong>Poison Control:</strong> 1-800-222-1222
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Map and Results -->
+        <div class="col-lg-8">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-map me-2"></i>Interactive Map
+                    </h5>
+                </div>
+                <div class="card-body p-0 position-relative">
+                    <div id="map" style="height: 500px; width: 100%;"></div>
+                </div>
+            </div>
+            
+            <!-- Facilities List -->
+            <div class="card mt-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="fas fa-list me-2"></i>Nearby Facilities
+                    </h6>
+                    <span id="facility-count" class="badge bg-primary">0 found</span>
+                </div>
+                <div class="card-body p-0">
+                    <div id="facilities-list" class="list-group list-group-flush">
+                        <div class="list-group-item text-center text-muted py-4">
+                            <i class="fas fa-map-marker-alt fs-1 mb-3 d-block"></i>
+                            Search for your location to find nearby healthcare facilities
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+<script>
+    // Initialize the map when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        initMap();
+    });
+</script>
+
+<style>
+    .emergency-contact {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .emergency-contact:last-child {
+        border-bottom: none;
+    }
+    
+    .facility-card {
+        border-left: 4px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .facility-card:hover {
+        border-left-color: #007bff;
+        background-color: #f8f9fa;
+    }
+    
+    .facility-type-hospital {
+        border-left-color: #dc3545;
+    }
+    
+    .facility-type-clinic {
+        border-left-color: #28a745;
+    }
+    
+    .facility-type-pharmacy {
+        border-left-color: #ffc107;
+    }
+    
+    .facility-type-urgent_care {
+        border-left-color: #fd7e14;
+    }
+    
+    .distance-badge {
+        background: linear-gradient(45deg, #007bff, #6610f2);
+        color: white;
+    }
+    
+    .loading-spinner {
+        padding: 2rem;
+    }
+    
+    #map {
+        border-radius: 0;
+    }
+    
+    .leaflet-container {
+        border-radius: 0;
+    }
+    
+    .user-location-marker {
+        border: none !important;
+        background: transparent !important;
+    }
+    
+    .facility-marker {
+        border: none !important;
+        background: transparent !important;
+    }
+</style>
+{% endblock %}

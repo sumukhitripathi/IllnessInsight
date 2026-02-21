@@ -1,0 +1,391 @@
+{% extends "base.html" %}
+
+{% block title %}Symptom Checker - IntelliMed{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5 pt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-gradient-info text-white">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-lg-10">
+                            <h2 class="card-title mb-2">
+                                <i class="fas fa-search me-2"></i>AI Symptom Checker
+                            </h2>
+                            <p class="card-text mb-0">
+                                Describe your symptoms and get AI-powered health insights. 
+                                <strong>This is not a substitute for professional medical advice.</strong>
+                            </p>
+                        </div>
+                        <div class="col-lg-2 text-lg-end">
+                            <i class="fas fa-user-md" style="font-size: 3rem; opacity: 0.7;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Important Disclaimer -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-warning border-warning">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-exclamation-triangle text-warning me-3 fs-4"></i>
+                    <div>
+                        <strong>Medical Disclaimer:</strong> This AI symptom checker provides general health information only. 
+                        It cannot diagnose conditions or replace professional medical advice. Always consult healthcare professionals 
+                        for proper diagnosis and treatment.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Symptom Input -->
+        <div class="col-lg-8 mb-4">
+            <!-- Step 1: Basic Information -->
+            <div class="card mb-4" id="basic-info-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <span class="badge bg-primary me-2">1</span>Basic Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="user-age" class="form-label">Age</label>
+                            <select class="form-select" id="user-age" required>
+                                <option value="">Select age range</option>
+                                <option value="0-2">0-2 years (Infant)</option>
+                                <option value="3-12">3-12 years (Child)</option>
+                                <option value="13-17">13-17 years (Teen)</option>
+                                <option value="18-30">18-30 years</option>
+                                <option value="31-50">31-50 years</option>
+                                <option value="51-65">51-65 years</option>
+                                <option value="65+">65+ years (Senior)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="user-gender" class="form-label">Gender</label>
+                            <select class="form-select" id="user-gender">
+                                <option value="">Prefer not to say</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Main Symptoms -->
+            <div class="card mb-4" id="main-symptoms-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <span class="badge bg-primary me-2">2</span>Main Symptoms
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="main-complaint" class="form-label">
+                            What is your main concern or symptom?
+                        </label>
+                        <textarea class="form-control" id="main-complaint" rows="3" 
+                                  placeholder="Describe what you're experiencing in your own words..."></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Common Symptoms (select all that apply)</label>
+                        <div id="common-symptoms" class="row">
+                            <!-- Common symptoms will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Symptom Details -->
+            <div class="card mb-4" id="symptom-details-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <span class="badge bg-primary me-2">3</span>Symptom Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="symptom-duration" class="form-label">How long have you had these symptoms?</label>
+                            <select class="form-select" id="symptom-duration">
+                                <option value="">Select duration</option>
+                                <option value="less-than-day">Less than a day</option>
+                                <option value="1-3-days">1-3 days</option>
+                                <option value="4-7-days">4-7 days</option>
+                                <option value="1-2-weeks">1-2 weeks</option>
+                                <option value="2-4-weeks">2-4 weeks</option>
+                                <option value="more-than-month">More than a month</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="symptom-severity" class="form-label">How would you rate the severity?</label>
+                            <select class="form-select" id="symptom-severity">
+                                <option value="">Select severity</option>
+                                <option value="mild">Mild - Minor discomfort</option>
+                                <option value="moderate">Moderate - Noticeable but manageable</option>
+                                <option value="severe">Severe - Significantly affecting daily life</option>
+                                <option value="very-severe">Very Severe - Debilitating</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Any additional symptoms?</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="fever" value="fever">
+                            <label class="form-check-label" for="fever">Fever or chills</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="fatigue" value="fatigue">
+                            <label class="form-check-label" for="fatigue">Fatigue or weakness</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="nausea" value="nausea">
+                            <label class="form-check-label" for="nausea">Nausea or vomiting</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="difficulty-breathing" value="difficulty-breathing">
+                            <label class="form-check-label" for="difficulty-breathing">Difficulty breathing</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Medical History -->
+            <div class="card mb-4" id="medical-history-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <span class="badge bg-primary me-2">4</span>Medical History (Optional)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="medical-conditions" class="form-label">
+                            Do you have any existing medical conditions?
+                        </label>
+                        <textarea class="form-control" id="medical-conditions" rows="2" 
+                                  placeholder="e.g., diabetes, high blood pressure, asthma..."></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="current-medications" class="form-label">
+                            Are you currently taking any medications?
+                        </label>
+                        <textarea class="form-control" id="current-medications" rows="2" 
+                                  placeholder="List any medications, supplements, or treatments..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analyze Button -->
+            <div class="text-center">
+                <button id="analyze-symptoms-btn" class="btn btn-primary btn-lg px-5">
+                    <i class="fas fa-search me-2"></i>Analyze Symptoms
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="col-lg-4">
+            <!-- Emergency Warning -->
+            <div class="card border-danger mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Seek Immediate Help If:
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-circle text-danger me-2"></i>
+                            Severe chest pain or pressure
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-circle text-danger me-2"></i>
+                            Difficulty breathing or shortness of breath
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-circle text-danger me-2"></i>
+                            Severe allergic reaction
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-circle text-danger me-2"></i>
+                            Loss of consciousness
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-circle text-danger me-2"></i>
+                            Severe bleeding
+                        </li>
+                        <li class="mb-0">
+                            <i class="fas fa-circle text-danger me-2"></i>
+                            Signs of stroke (FAST)
+                        </li>
+                    </ul>
+                    
+                    <div class="text-center mt-3">
+                        <a href="tel:108" class="btn btn-danger">
+                            <i class="fas fa-phone me-2"></i>Call 108
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Results -->
+            <div class="card" id="results-card" style="display: none;">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-clipboard-list me-2"></i>Analysis Results
+                    </h6>
+                </div>
+                <div class="card-body" id="analysis-results">
+                    <!-- Results will be populated here -->
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-link me-2"></i>Quick Links
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('facility_finder') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-map-marker-alt me-2"></i>Find Healthcare Providers
+                        </a>
+                        <a href="{{ url_for('appointments') }}" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-calendar-check me-2"></i>Book Appointment
+                        </a>
+                        <a href="{{ url_for('chat', persona='empathetic') }}" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-comments me-2"></i>Chat with AI Assistant
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Previous Analyses -->
+    <div class="row mt-4" id="history-section" style="display: none;">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history me-2"></i>Previous Analyses
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="analysis-history">
+                        <!-- Previous analyses will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Modal -->
+<div class="modal fade" id="loadingModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center py-4">
+                <div class="spinner-border text-primary mb-3" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <h5>Analyzing Your Symptoms</h5>
+                <p class="text-muted mb-0">Our AI is reviewing your information...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/disease_prediction.js') }}"></script>
+
+<style>
+    .bg-gradient-info {
+        background: linear-gradient(135deg, #17a2b8 0%, #6610f2 100%) !important;
+    }
+
+    .symptom-checkbox {
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .symptom-checkbox:hover {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+    }
+
+    .symptom-checkbox.selected {
+        background-color: #e7f3ff;
+        border-color: #007bff;
+    }
+
+    .urgency-low { border-left: 4px solid #28a745; }
+    .urgency-medium { border-left: 4px solid #ffc107; }
+    .urgency-high { border-left: 4px solid #fd7e14; }
+    .urgency-emergency { border-left: 4px solid #dc3545; }
+
+    .confidence-bar {
+        height: 8px;
+        border-radius: 4px;
+        background: linear-gradient(90deg, #dc3545 0%, #ffc107 50%, #28a745 100%);
+    }
+
+    .recommendation-item {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+        border-left: 3px solid #007bff;
+    }
+
+    .step-indicator {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+    }
+
+    .step {
+        flex: 1;
+        text-align: center;
+        position: relative;
+    }
+
+    .step::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        right: 0;
+        width: 100%;
+        height: 2px;
+        background: #dee2e6;
+        z-index: -1;
+    }
+
+    .step:last-child::after {
+        display: none;
+    }
+
+    .step.active::after {
+        background: #007bff;
+    }
+</style>
+{% endblock %}
