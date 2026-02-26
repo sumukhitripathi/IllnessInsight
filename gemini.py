@@ -4,6 +4,8 @@ import os
 from google import genai
 from google.genai import types
 from pydantic import BaseModel
+from dotenv import load_dotenv
+load_dotenv()
 
 # IMPORTANT: KEEP THIS COMMENT
 # Follow these instructions when using this blueprint:
@@ -13,7 +15,6 @@ from pydantic import BaseModel
 # The SDK was recently renamed from google-generativeai to google-genai. This file reflects the new name and the new APIs.
 
 # This API key is from Gemini Developer API Key, not vertex AI API Key
-os.environ['GEMINI_API_KEY'] = "AIzaSyCZGGDVIyjebUyHX8m0xO6f1pBD6KKjErc"
 client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
 class ChatResponse(BaseModel):
